@@ -27,6 +27,19 @@ A change is not done until pytest and ruff are both green.
 uv run switchbot-e6 photo.jpg     # no args -> prints the full help
 ```
 
+## Releases
+
+```
+uv version --bump patch|minor|major  →  CHANGELOG.md entry  →  PR  →  merge
+→  signed tag vX.Y.Z on the merge commit  →  dispatch the Release workflow
+→  approve the production gate
+```
+
+The pipeline only verifies (tag at HEAD, CHANGELOG entry, version not already
+on PyPI) - it never bumps or publishes on its own. Docs-only changes (like
+this file) do not need a version bump; versions are burned permanently on
+PyPI, so bump only when releasing.
+
 ## Conventions & constraints
 
 - Keep it small: one module (`src/switchbot_e6_optimizer/optimizer.py`), plain
