@@ -1,0 +1,13 @@
+version: 2
+updates:
+  # Keeps the SHA-pinned actions fresh (Dependabot updates the SHA and the
+  # version comment together).
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: uv
+    directory: /
+    schedule:
+      interval: weekly

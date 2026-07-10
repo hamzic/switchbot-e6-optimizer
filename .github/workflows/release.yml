@@ -1,0 +1,91 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {} # deny-all default; grant per job
+
+# Serialize release runs; never cancel a publish mid-flight.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  # Runs on every merge to main as a packaging smoke test, and feeds the
+  # publish job on manual dispatch. No environment, no OIDC.
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          enable-cache: false
+      - run: uv build
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  # The only path to PyPI: a manual dispatch (write access required), from
+  # main only, behind the production reviewer gate, via OIDC trusted
+  # publishing (no stored token). Releases are explicit: this job verifies,
+  # it never bumps.
+  publish:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production # reviewer gate + env secrets live here
+    permissions:
+      contents: read
+      id-token: write # OIDC trusted publishing; no stored token
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          fetch-tags: true
+      - uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          enable-cache: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: dist
+          path: dist
+      - name: Guard release version
+        run: |
+          [ "$GITHUB_REF" = "refs/heads/main" ] || {
+            echo "::error::release dispatch is allowed only from main"
+            exit 1
+          }
+          VERSION="$(uv version --short)"
+          echo "Releasing version $VERSION"
+          echo "Tags at HEAD: $(git tag --points-at HEAD | tr '\n' ' ')"
+          git tag --points-at HEAD | grep -qxF "v$VERSION" || {
+            echo "::error::no v$VERSION tag at HEAD - tag the release commit first"
+            exit 1
+          }
+          grep -qF "## [$VERSION]" CHANGELOG.md || {
+            echo "::error::CHANGELOG.md has no entry for $VERSION"
+            exit 1
+          }
+          code="$(curl -sS -o /dev/null -w '%{http_code}' "https://pypi.org/pypi/switchbot-e6-optimizer/$VERSION/json")"
+          case "$code" in
+            404) echo "PyPI: $VERSION not yet published" ;;
+            200)
+              echo "::error::version $VERSION is already published on PyPI"
+              exit 1
+              ;;
+            *)
+              echo "::error::PyPI availability check inconclusive (HTTP $code)"
+              exit 1
+              ;;
+          esac
+      - run: uv publish

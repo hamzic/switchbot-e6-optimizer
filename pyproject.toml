@@ -1,0 +1,58 @@
+[project]
+name = "switchbot-e6-optimizer"
+version = "1.0.0"
+description = "Optimise photos for the SwitchBot 13.3\" AI Art Frame (E Ink Spectra 6)."
+readme = "README.md"
+requires-python = ">=3.14"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "switchbot-e6-optimizer contributors" }]
+keywords = ["switchbot", "e-ink", "eink", "spectra6", "epaper", "image", "pillow"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Multimedia :: Graphics",
+]
+dependencies = ["pillow>=12", "pillow-heif>=1"]
+
+[project.scripts]
+switchbot-e6 = "switchbot_e6_optimizer.optimizer:main"
+
+[project.urls]
+Homepage = "https://github.com/hamzic/switchbot-e6-optimizer"
+Repository = "https://github.com/hamzic/switchbot-e6-optimizer"
+Issues = "https://github.com/hamzic/switchbot-e6-optimizer/issues"
+Changelog = "https://github.com/hamzic/switchbot-e6-optimizer/blob/main/CHANGELOG.md"
+
+[build-system]
+requires = ["uv_build>=0.11.28,<0.12"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.14"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py314"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors (PEP 8)
+    "F",   # Pyflakes
+    "I",   # isort (import sorting)
+    "UP",  # pyupgrade (modernise syntax for the target version)
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+    "C4",  # flake8-comprehensions
+]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["error::DeprecationWarning"]
