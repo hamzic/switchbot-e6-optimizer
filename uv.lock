@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = ">=3.14"
 
 [[package]]
@@ -183,7 +183,7 @@ wheels = [
 
 [[package]]
 name = "switchbot-e6-optimizer"
-version = "1.1.0"
+version = "1.1.1"
 source = { editable = "." }
 dependencies = [
     { name = "pillow" },
@@ -198,7 +198,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "pillow", specifier = ">=12" },
+    { name = "pillow", specifier = ">=13" },
     { name = "pillow-heif", specifier = ">=1" },
 ]
 

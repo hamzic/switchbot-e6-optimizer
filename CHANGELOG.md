@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.1.1] - 2026-11-18
+
+### Security
+- Require Pillow 13.0.0 or newer (was `>=12`). Pillow releases before 13.0.0
+  carry numerous published vulnerabilities, including heap buffer overflows
+  reachable from `Image.open()`, which this tool calls on every input image.
+
+### Changed
+- Dependency refresh: pillow-heif 1.8.1, ruff 0.17.5, uv-build `<0.14`, and
+  updated CI actions.
+
 ## [1.1.0] - 2026-07-24
 
 ### Changed
@@ -51,5 +62,6 @@
 
 _Initial release._
 
+[1.1.1]: https://github.com/hamzic/switchbot-e6-optimizer/releases/tag/v1.1.1
 [1.1.0]: https://github.com/hamzic/switchbot-e6-optimizer/releases/tag/v1.1.0
 [1.0.0]: https://github.com/hamzic/switchbot-e6-optimizer/releases/tag/v1.0.0
