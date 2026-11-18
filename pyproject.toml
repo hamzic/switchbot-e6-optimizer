@@ -1,6 +1,6 @@
 [project]
 name = "switchbot-e6-optimizer"
-version = "1.1.0"
+version = "1.1.1"
 description = "Optimise photos for the SwitchBot 13.3\" AI Art Frame (E Ink Spectra 6)."
 readme = "README.md"
 requires-python = ">=3.14"
@@ -16,7 +16,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Topic :: Multimedia :: Graphics",
 ]
-dependencies = ["pillow>=12", "pillow-heif>=1"]
+dependencies = ["pillow>=13", "pillow-heif>=1"]
 
 [project.scripts]
 switchbot-e6 = "switchbot_e6_optimizer.optimizer:main"
