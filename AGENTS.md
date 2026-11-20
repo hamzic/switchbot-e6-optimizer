@@ -35,6 +35,25 @@ uv version --bump patch|minor|major  →  CHANGELOG.md entry  →  PR  →  merg
 →  approve the production gate
 ```
 
+### Mandatory pre-merge gate
+
+Never merge a pull request into `main` while any CI/CD check is pending,
+skipped unexpectedly, or failing. Before merging, confirm every required
+GitHub Actions check has completed successfully and run the full candidate
+validation from the exact commit being merged:
+
+```bash
+uv run pytest
+uv run ruff check .
+uv run ruff format --check .
+uv build
+```
+
+For a release PR, also confirm that the build produced both the wheel and
+source distribution with the intended version. Do not rely on post-merge
+`main` workflows to discover test, lint, formatting, packaging, or versioning
+failures.
+
 The pipeline only verifies (tag at HEAD, CHANGELOG entry, version not already
 on PyPI) - it never bumps or publishes on its own. Docs-only changes (like
 this file) do not need a version bump; versions are burned permanently on
